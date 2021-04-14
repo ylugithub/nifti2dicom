@@ -1,9 +1,9 @@
-Note: This repo build only command line tools: src/core. todo: src/gui
+Note: This repo build **only** command line tools: src/core. todo: src/gui
 
-Build with:
-  TCLAP 1.2.4  
-  GDCM 3.0.8  
-  ITK 5.2.0  
+Build with:  
+- TCLAP 1.2.4  
+- GDCM 3.0.8  
+- ITK 5.2.0  
 
 
 Nifti2Dicom
