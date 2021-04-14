@@ -23,6 +23,8 @@
 #include <itkCastImageFilter.h>
 #include <itkOrientImageFilter.h>
 #include <sstream>
+
+//original code
 //#define NO_REORIENT
 
 
@@ -115,6 +117,23 @@ bool InputFilter::Filter( void )
     std::cout << m_FilteredImage->GetDirection() << std::endl;
 #endif // DEBUG
 
+    ///////////////////////////
+    //Khan lab
+    //date: 2021.04.13
+    //validate reorient
+    //48 canonical orientations, note: NO_REORIENT is the default value without specify --reorient
+    std::vector<std::string> v = {"NO_REORIENT", "RIP","LIP","RSP","LSP","RIA","LIA","RSA",\
+        "LSA","IRP","ILP","SRP","SLP","IRA","ILA","SRA","SLA","RPI","LPI","RAI",\
+        "LAI","RPS","LPS","RAS","LAS","PRI","PLI","ARI","ALI","PRS","PLS","ARS",\
+        "ALS","IPR","SPR","IAR","SAR","IPL","SPL","IAL","SAL","PIR","PSR","AIR",\
+        "ASR","PIL","PSL","AIL","ASL" };
+
+    if (std::find(v.begin(), v.end(), m_FiltersArgs.reorient) == v.end())
+    {
+        //--reorient type not valid.
+        std::cerr << "ERROR: Unknown reorient type" << std::endl;
+        return false;
+    }
     return ret;
 }
 
@@ -141,32 +160,102 @@ template<class TPixel> bool InputFilter::InternalFilter(void)
         std::cerr<<"Error Null Pointer In Filter"<<std::endl;
         return false;
     }
+
+
     //BEGIN Orienting image
-    #ifndef NO_REORIENT
-    orienter = OrienterType::New();
-    orienter->UseImageDirectionOn();
-    orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI); //Orient to RAI
-    orienter->SetInput(internalImage);
+    // 
+    // Khan lab
+    // date: 2021.04.13
+    // 
+    std::map<std::string, itk::SpatialOrientation::ValidCoordinateOrientationFlags> string_to_orient_map = {
+        { "RIP", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIP},
+        { "LIP", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIP},
+        { "RSP", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSP},
+        { "LSP", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LSP},
+        { "RIA", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIA},
+        { "LIA", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LIA},
+        { "RSA", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSA},
+        { "LSA", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LSA},
+        { "IRP", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IRP},
+        { "ILP", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ILP},
+        { "SRP", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SRP},
+        { "SLP", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SLP},
+        { "IRA", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IRA},
+        { "ILA", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ILA},
+        { "SRA", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SRA},
+        { "SLA", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SLA},
+        { "RPI", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPI},
+        { "LPI", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LPI},
+        { "RAI", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI},
+        { "LAI", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LAI},
+        { "RPS", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RPS},
+        { "LPS", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LPS},
+        { "RAS", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAS},
+        { "LAS", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_LAS},
+        { "PRI", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PRI},
+        { "PLI", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PLI},
+        { "ARI", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ARI},
+        { "ALI", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ALI},
+        { "PRS", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PRS},
+        { "PLS", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PLS},
+        { "ARS", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ARS},
+        { "ALS", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ALS},
+        { "IPR", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IPR},
+        { "SPR", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SPR},
+        { "IAR", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IAR},
+        { "SAR", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SAR},
+        { "IPL", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IPL},
+        { "SPL", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SPL},
+        { "IAL", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_IAL},
+        { "SAL", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_SAL},
+        { "PIR", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PIR},
+        { "PSR", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PSR},
+        { "AIR", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIR},
+        { "ASR", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASR},
+        { "PIL", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PIL},
+        { "PSL", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_PSL},
+        { "AIL", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_AIL},
+        { "ASL", itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL}
+    };
 
-    try
+    //original code
+    //#ifndef NO_REORIENT
+    if (m_FiltersArgs.reorient != std::string("NO_REORIENT"))
     {
-        std::cout << " * \033[1;34mOrienting\033[0m... " << std::endl;
-        orienter->Update();
-        std::cout << " * \033[1;34mOrienting\033[0m... \033[1;32mDONE\033[0m" << std::endl;
-    }
-    catch ( itk::ExceptionObject & ex )
-    {
-        std::cout << " * \033[1;34mOrienting\033[0m... \033[1;31mFAIL\033[0m" << std::endl;
-        std::string message;
-        message = ex.GetLocation();
-        message += "\n";
-        message += ex.GetDescription();
-        std::cerr << message << std::endl;
-        return false;
-    }
 
-    itk::EncapsulateMetaData<std::string>(m_Dict, patientorientationtag, defaultpatientorientation);
-    #endif
+        orienter = OrienterType::New();
+        orienter->UseImageDirectionOn();
+        //original code
+        //orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI); //Orient to RAI
+        
+        orienter->SetDesiredCoordinateOrientation(string_to_orient_map[m_FiltersArgs.reorient]);
+        orienter->SetInput(internalImage);
+
+        try
+        {
+            std::cout << " * \033[1;34mOrienting\033[0m... " << std::endl;
+            orienter->Update();
+            std::cout << " * \033[1;34mOrienting\033[0m... \033[1;32mDONE\033[0m" << std::endl;
+        }
+        catch (itk::ExceptionObject& ex)
+        {
+            std::cout << " * \033[1;34mOrienting\033[0m... \033[1;31mFAIL\033[0m" << std::endl;
+            std::string message;
+            message = ex.GetLocation();
+            message += "\n";
+            message += ex.GetDescription();
+            std::cerr << message << std::endl;
+            return false;
+        }
+
+        // Khan lab: commented this line
+        // date: 2021.04.13
+        // reason: Patient Orientation (0020,0020) is Required if the value of Spatial Locations Preserved(0028, 135A) is REORIENTED_ONLY.
+        //         Spatial Locations Preserved(0028, 135A) is type 3: most ot time, it's ignored
+
+        //itk::EncapsulateMetaData<std::string>(m_Dict, patientorientationtag, defaultpatientorientation);
+        //#endif
+    }
     //END Orienting image
 
 
@@ -175,11 +264,21 @@ template<class TPixel> bool InputFilter::InternalFilter(void)
     {
         //BEGIN Rescale
         rescaleFilter = RescaleType::New();
-        #ifdef NO_REORIENT
-        rescaleFilter->SetInput(internalImage);
-        #else
-        rescaleFilter->SetInput(orienter->GetOutput());
-        #endif
+
+        //original code
+        //#ifdef NO_REORIENT
+
+        if (m_FiltersArgs.reorient == "NO_REORIENT")
+        {
+            rescaleFilter->SetInput(internalImage);
+        }
+        //#else
+        else
+        {
+            rescaleFilter->SetInput(orienter->GetOutput());
+        }
+        //#endif
+
         rescaleFilter->SetOutputMinimum( 0 );
         rescaleFilter->SetOutputMaximum( (2^11)-1 );
 
@@ -208,11 +307,21 @@ template<class TPixel> bool InputFilter::InternalFilter(void)
         //BEGIN Cast
         // Caster
         cast = CastType::New();
-        #ifdef NO_REORIENT
-        cast->SetInput(internalImage);
-        #else
-        cast->SetInput(orienter->GetOutput());
-        #endif
+
+        //original code
+        //#ifdef NO_REORIENT
+
+        if (m_FiltersArgs.reorient == "NO_REORIENT")
+        {
+            cast->SetInput(internalImage);
+        }
+        //#else
+        else
+        {
+            cast->SetInput(orienter->GetOutput());
+        }
+        //#endif
+
         try
         {
             std::cout << " * \033[1;34mCasting\033[0m... " << std::endl;

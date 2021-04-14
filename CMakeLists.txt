@@ -27,14 +27,26 @@ project(Nifti2Dicom)
 
 set(Nifti2Dicom_MAJOR_VERSION "0")
 set(Nifti2Dicom_MINOR_VERSION "4")
-set(Nifti2Dicom_PATCH_VERSION "11")
-set(Nifti2Dicom_VERSION "0.4.11")
+set(Nifti2Dicom_PATCH_VERSION "20210412")
+set(Nifti2Dicom_VERSION "0.4.20210412")
 set(Nifti2Dicom_INTERNAL_VERSION "${Nifti2Dicom_MAJOR_VERSION}.${Nifti2Dicom_MINOR_VERSION}.${Nifti2Dicom_PATCH_VERSION}")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 #Check TCLAP Library [Templatized C++ Command Line Parser] (1.2.0)
-find_package(TCLAP 1.2.0 REQUIRED)
+
+##############################
+#Khan lab, date: 2021.04.12
+#win32: specify TCLAP_INCLUDE_DIRS manually instead
+##############################
+
+if(WIN32)
+    SET(TCLAP_INCLUDE_DIRS "d:\\nifti2dicom_project\\tclap-1.2.4\\include")    
+else(WIN32)
+    find_package(TCLAP 1.2.0 REQUIRED)
+endif()
+
+
 include_directories(${TCLAP_INCLUDE_DIRS})
 
 # Check ITK Library [Insight ToolKit] (3.17.0)
@@ -42,24 +54,32 @@ find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
 
 #Check VTK Library [Visualization ToolKit]
-find_package(VTK REQUIRED)
-include(${VTK_USE_FILE})
+
+##############################
+#Khan lab, commented 2021.04.12
+#reason:need to build the command line nifti2dicom.todo: GUI version.
+##############################
+
+#find_package(VTK REQUIRED)
+#include(${VTK_USE_FILE})
 
 #TODO Check QVTK
 
-if(VTK_QT_VERSION EQUAL 5)
-    set(Nifti2Dicom_QT_VERSION 5)
+#yingli commented 2021.04.12
 
-    #Check Qt5 Library [Qt5]
-    find_package(Qt5 COMPONENTS Core Gui Widgets)
-else()
-    set(Nifti2Dicom_QT_VERSION 4)
+#if(VTK_QT_VERSION EQUAL 5)
+#    set(Nifti2Dicom_QT_VERSION 5)
 
-    #Check Qt4 Library [Qt4] (4.4.0)
-    set(QT_USE_IMPORTED_TARGETS TRUE)
-    find_package(Qt4 4.4.0 REQUIRED)
+#    #Check Qt5 Library [Qt5]
+#    find_package(Qt5 COMPONENTS Core Gui Widgets)
+#else()
+#    set(Nifti2Dicom_QT_VERSION 4)
 
-endif()
+#    #Check Qt4 Library [Qt4] (4.4.0)
+#    set(QT_USE_IMPORTED_TARGETS TRUE)
+#    find_package(Qt4 4.4.0 REQUIRED)
+
+#endif()
 
 
 configure_file(${CMAKE_SOURCE_DIR}/Nifti2DicomConfig.h.cmake ${CMAKE_BINARY_DIR}/Nifti2DicomConfig.h)

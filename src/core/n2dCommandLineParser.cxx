@@ -455,6 +455,7 @@ bool CommandLineParser::Parse(int argc, char* argv[])
                 "string",
                 cmd);
 
+     
     //END Input command line arguments
 
 
@@ -468,6 +469,19 @@ bool CommandLineParser::Parse(int argc, char* argv[])
                 "Rescale image before exporting",
                 cmd,
                 false);
+
+        // -----------------------------------------------------------------------------
+        // Reorient image
+        // Khan lab, date: 2021.04.12
+        // -----------------------------------------------------------------------------
+        // NO_REORIENT is the default value without specify --reorient
+        TCLAP::ValueArg<std::string> reorientArg("", "reorient",
+            "Reorient image before exporting. Pick one of 48 canonical orientations(RAI,LPI,...), for example: --reorient RAI. Without this option means no reorient.",
+            false, "NO_REORIENT",
+            "string",
+            cmd);
+
+
     //END Filters command line arguments
 
 
@@ -621,8 +635,14 @@ bool CommandLineParser::Parse(int argc, char* argv[])
 
         //BEGIN Filters command line arguments
         filtersArgs.rescale         = rescaleSwitch.getValue();
-        //END Filters command line arguments
 
+        ///////////////////////
+        //Khan lab
+        //date: 2021.04.12
+        ///////////////////////
+        filtersArgs.reorient = reorientArg.getValue();
+
+        //END Filters command line arguments
 
 
         //BEGIN Output command line arguments
@@ -741,6 +761,9 @@ void CommandLineParser::DebugPrint( void )
 //BEGIN Filter
     std::cout << "Filter:" << std::endl;
     std::cout << "              rescale                     = " << filtersArgs.rescale         << std::endl;
+    //Khan lab
+    //date:2021.04.12
+    std::cout << "              reorient                     = " << filtersArgs.reorient << std::endl;
     std::cout << "-----------------------------------------" << std::endl;
 //END Filter
 

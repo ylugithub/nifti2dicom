@@ -18,4 +18,5 @@
 
 
 add_subdirectory(core)
-add_subdirectory(gui)
+#Khan lab commented 2021.04.12
+#add_subdirectory(gui)

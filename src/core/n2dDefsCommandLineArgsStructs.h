@@ -240,6 +240,12 @@ typedef struct FiltersArgs
     FiltersArgs() : rescale(false) {}
 
 //    std::string orientation; //TODO
+    /////////////////////////
+    // Khan lab
+    // Date: 2021.04.13
+    /////////////////////////
+    std::string reorient;
+
     bool rescale;
 } FiltersArgs;
 //END struct n2d::FiltersArgs
