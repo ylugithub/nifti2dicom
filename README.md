@@ -5,6 +5,9 @@ Build with:
 - GDCM 3.0.8  
 - ITK 5.2.0  
 
+The standalone executable binaries uploaded to **Releases**, just download and use it.
+
+docker container: yinglilu/nifti2dicom
 
 Nifti2Dicom
 ===========
